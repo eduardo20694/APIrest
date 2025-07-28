@@ -18,6 +18,8 @@ app.post("/teste-json", (req, res) => {
   res.json({ recebido: req.body });
 });
 
+console.log("Registrando rotas /auth");
+
 // Rotas públicas
 app.use("/auth", authRoutes);
 
