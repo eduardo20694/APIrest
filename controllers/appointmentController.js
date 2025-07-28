@@ -3,7 +3,7 @@ const { pool } = require("../db");
 // Buscar todos os compromissos
 const getAppointments = async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM compromissos");
+    const result = await pool.query("SELECT * FROM compromissos ORDER BY hora ASC");
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
@@ -11,7 +11,7 @@ const getAppointments = async (req, res) => {
   }
 };
 
-// Criar novo compromisso (precisa de título e hora)
+// Criar novo compromisso com título e hora
 const createAppointment = async (req, res) => {
   const { titulo, hora } = req.body;
 
@@ -20,11 +20,11 @@ const createAppointment = async (req, res) => {
   }
 
   try {
-    await pool.query(
-      "INSERT INTO compromissos (titulo, hora) VALUES ($1, $2)",
-      [titulo, hora]
+    const result = await pool.query(
+      "INSERT INTO compromissos (titulo, hora) VALUES ($1, $2) RETURNING *",
+      [titulo.trim(), hora]
     );
-    res.status(201).json({ message: "Compromisso criado com sucesso!" });
+    res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao criar compromisso." });

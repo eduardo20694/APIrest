@@ -3,7 +3,7 @@ const { pool } = require('../db');
 // Buscar todas as tarefas
 const getTasks = async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM tarefas');
+    const result = await pool.query('SELECT * FROM tarefas ORDER BY id DESC');
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
@@ -15,16 +15,16 @@ const getTasks = async (req, res) => {
 const createTask = async (req, res) => {
   const { titulo } = req.body;
 
-  if (!titulo) {
+  if (!titulo || !titulo.trim()) {
     return res.status(400).json({ error: 'Título é obrigatório.' });
   }
 
   try {
-    await pool.query(
-      'INSERT INTO tarefas (titulo) VALUES ($1)', 
-      [titulo]
+    const result = await pool.query(
+      'INSERT INTO tarefas (titulo, done) VALUES ($1, false) RETURNING *',
+      [titulo.trim()]
     );
-    res.status(201).json({ message: 'Tarefa criada com sucesso!' });
+    res.status(201).json(result.rows[0]); // Retorna a tarefa criada
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erro ao criar tarefa.' });
