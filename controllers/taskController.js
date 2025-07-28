@@ -1,5 +1,6 @@
 const { pool } = require('../db');
 
+// Buscar todas as tarefas
 const getTasks = async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM tarefas');
@@ -10,15 +11,18 @@ const getTasks = async (req, res) => {
   }
 };
 
+// Criar uma nova tarefa (só precisa de título)
 const createTask = async (req, res) => {
-  const { titulo, descricao } = req.body;
-  if (!titulo || !descricao) {
-    return res.status(400).json({ error: 'Título e descrição são obrigatórios.' });
+  const { titulo } = req.body;
+
+  if (!titulo) {
+    return res.status(400).json({ error: 'Título é obrigatório.' });
   }
+
   try {
     await pool.query(
-      'INSERT INTO tarefas (titulo, descricao) VALUES ($1, $2)', 
-      [titulo, descricao]
+      'INSERT INTO tarefas (titulo) VALUES ($1)', 
+      [titulo]
     );
     res.status(201).json({ message: 'Tarefa criada com sucesso!' });
   } catch (err) {

@@ -1,5 +1,6 @@
 const { pool } = require("../db");
 
+// Buscar todos os compromissos
 const getAppointments = async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM compromissos");
@@ -10,17 +11,18 @@ const getAppointments = async (req, res) => {
   }
 };
 
+// Criar novo compromisso (precisa de título e hora)
 const createAppointment = async (req, res) => {
-  const { titulo, descricao, data } = req.body;
+  const { titulo, hora } = req.body;
 
-  if (!titulo || !data) {
-    return res.status(400).json({ error: "Título e data são obrigatórios." });
+  if (!titulo || !hora) {
+    return res.status(400).json({ error: "Título e hora são obrigatórios." });
   }
 
   try {
     await pool.query(
-      "INSERT INTO compromissos (titulo, descricao, data) VALUES ($1, $2, $3)",
-      [titulo, descricao || "", data]
+      "INSERT INTO compromissos (titulo, hora) VALUES ($1, $2)",
+      [titulo, hora]
     );
     res.status(201).json({ message: "Compromisso criado com sucesso!" });
   } catch (err) {
