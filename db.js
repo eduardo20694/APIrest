@@ -3,15 +3,11 @@ require('dotenv').config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // necessário para conexões com alguns servidores (ex: Railway)
-  },
+  ssl: { rejectUnauthorized: false },
 });
 
-// Função para criar tabelas se não existirem
 async function criarTabelas() {
   try {
-    // Usuários
     await pool.query(`
       CREATE TABLE IF NOT EXISTS usuarios (
         id SERIAL PRIMARY KEY,
@@ -22,7 +18,6 @@ async function criarTabelas() {
       );
     `);
 
-    // Tarefas
     await pool.query(`
       CREATE TABLE IF NOT EXISTS tarefas (
         id SERIAL PRIMARY KEY,
@@ -30,7 +25,19 @@ async function criarTabelas() {
       );
     `);
 
-    // Compromissos
+    const colunaDone = await pool.query(`
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name='tarefas' AND column_name='done';
+    `);
+
+    if (colunaDone.rowCount === 0) {
+      await pool.query(`
+        ALTER TABLE tarefas ADD COLUMN done BOOLEAN DEFAULT FALSE;
+      `);
+      console.log('Coluna "done" adicionada na tabela tarefas.');
+    }
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS compromissos (
         id SERIAL PRIMARY KEY,
@@ -39,7 +46,6 @@ async function criarTabelas() {
       );
     `);
 
-    // PDFs
     await pool.query(`
       CREATE TABLE IF NOT EXISTS pdfs (
         id SERIAL PRIMARY KEY,
@@ -48,13 +54,12 @@ async function criarTabelas() {
       );
     `);
 
-    console.log('Tabelas criadas ou já existiam.');
+    console.log('Tabelas criadas e atualizadas com sucesso.');
   } catch (err) {
-    console.error('Erro ao criar tabelas:', err);
+    console.error('Erro ao criar/atualizar tabelas:', err);
   }
 }
 
-// Chama a função ao importar o módulo
 criarTabelas();
 
 module.exports = { pool };
