@@ -8,6 +8,7 @@ const pool = new Pool({
 
 async function criarTabelas() {
   try {
+    // Criar tabela usuários
     await pool.query(`
       CREATE TABLE IF NOT EXISTS usuarios (
         id SERIAL PRIMARY KEY,
@@ -18,6 +19,7 @@ async function criarTabelas() {
       );
     `);
 
+    // Criar tabela tarefas
     await pool.query(`
       CREATE TABLE IF NOT EXISTS tarefas (
         id SERIAL PRIMARY KEY,
@@ -27,27 +29,27 @@ async function criarTabelas() {
       );
     `);
 
-    // Garantir que colunas existam (caso tabela já criada)
+    // Verificar e adicionar coluna 'done' se não existir (precisa? já criada acima)
     const colunaDone = await pool.query(`
       SELECT column_name FROM information_schema.columns 
       WHERE table_name='tarefas' AND column_name='done';
     `);
-
     if (colunaDone.rowCount === 0) {
       await pool.query(`ALTER TABLE tarefas ADD COLUMN done BOOLEAN DEFAULT FALSE;`);
       console.log('Coluna "done" adicionada na tabela tarefas.');
     }
 
+    // Verificar e adicionar coluna 'date' se não existir (precisa? já criada acima)
     const colunaDateTarefas = await pool.query(`
       SELECT column_name FROM information_schema.columns 
       WHERE table_name='tarefas' AND column_name='date';
     `);
-
     if (colunaDateTarefas.rowCount === 0) {
       await pool.query(`ALTER TABLE tarefas ADD COLUMN date DATE NOT NULL DEFAULT CURRENT_DATE;`);
       console.log('Coluna "date" adicionada na tabela tarefas.');
     }
 
+    // Criar tabela compromissos
     await pool.query(`
       CREATE TABLE IF NOT EXISTS compromissos (
         id SERIAL PRIMARY KEY,
@@ -57,16 +59,17 @@ async function criarTabelas() {
       );
     `);
 
+    // Verificar e adicionar coluna 'date' em compromissos se não existir
     const colunaDateCompromissos = await pool.query(`
       SELECT column_name FROM information_schema.columns 
       WHERE table_name='compromissos' AND column_name='date';
     `);
-
     if (colunaDateCompromissos.rowCount === 0) {
       await pool.query(`ALTER TABLE compromissos ADD COLUMN date DATE NOT NULL DEFAULT CURRENT_DATE;`);
       console.log('Coluna "date" adicionada na tabela compromissos.');
     }
 
+    // Criar tabela pdfs
     await pool.query(`
       CREATE TABLE IF NOT EXISTS pdfs (
         id SERIAL PRIMARY KEY,
