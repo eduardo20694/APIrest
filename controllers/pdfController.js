@@ -2,7 +2,14 @@ const { pool } = require("../db");
 
 const getPdfs = async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM pdfs");
+    // Busca somente os PDFs do usuário logado (req.user.id)
+    const userId = req.user.id;
+
+    const result = await pool.query(
+      "SELECT * FROM pdfs WHERE user_id = $1 ORDER BY id DESC",
+      [userId]
+    );
+
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
@@ -15,11 +22,15 @@ const createPdf = async (req, res) => {
   if (!titulo || !url) {
     return res.status(400).json({ error: "Título e URL são obrigatórios." });
   }
+
   try {
+    const userId = req.user.id;
+
     await pool.query(
-      "INSERT INTO pdfs (titulo, url) VALUES ($1, $2)",
-      [titulo, url]
+      "INSERT INTO pdfs (titulo, url, user_id) VALUES ($1, $2, $3)",
+      [titulo, url, userId]
     );
+
     res.status(201).json({ message: "PDF criado com sucesso!" });
   } catch (err) {
     console.error(err);
