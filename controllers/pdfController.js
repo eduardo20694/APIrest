@@ -17,6 +17,9 @@ const getPdfs = async (req, res) => {
 
 // Criar PDF com upload de arquivos
 const createPdf = async (req, res) => {
+
+  console.log("req.user:", req.user);
+  
   try {
     const userId = req.user.id;
     const files = req.files;
