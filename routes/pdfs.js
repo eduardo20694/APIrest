@@ -28,7 +28,7 @@ const upload = multer({ storage });
 router.get("/", authMiddleware, getPdfs);
 
 // Enviar PDFs (campo 'pdfs' deve bater com o frontend)
-router.post("/", authMiddleware, upload.array("pdfs"), createPdf);
+router.post("/", authMiddleware, upload.array("files"), createPdf);
 
 // Deletar PDF por ID
 router.delete("/:id", authMiddleware, deletePdf);
