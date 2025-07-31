@@ -22,7 +22,13 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    // Aceita qualquer tipo de arquivo
+    cb(null, true);
+  },
+});
 
 // Buscar PDFs
 router.get("/", authMiddleware, getPdfs);
