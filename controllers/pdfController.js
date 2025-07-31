@@ -1,6 +1,5 @@
 const { pool } = require("../db");
 
-// Buscar PDFs do usuário autenticado
 const getPdfs = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -15,12 +14,11 @@ const getPdfs = async (req, res) => {
   }
 };
 
-// Criar PDF com upload de arquivos
 const createPdf = async (req, res) => {
-
-  console.log("req.user:", req.user);
-  
   try {
+    console.log("req.user:", req.user);
+    console.log("req.files:", req.files);
+
     const userId = req.user.id;
     const files = req.files;
 
@@ -49,13 +47,11 @@ const createPdf = async (req, res) => {
   }
 };
 
-// Deletar PDF por ID
 const deletePdf = async (req, res) => {
   try {
     const userId = req.user.id;
     const pdfId = req.params.id;
 
-    // Verifica se o PDF pertence ao usuário
     const check = await pool.query(
       "SELECT * FROM pdfs WHERE id = $1 AND user_id = $2",
       [pdfId, userId]
@@ -65,7 +61,6 @@ const deletePdf = async (req, res) => {
       return res.status(404).json({ error: "PDF não encontrado ou não autorizado." });
     }
 
-    // Remove do banco
     await pool.query("DELETE FROM pdfs WHERE id = $1", [pdfId]);
 
     res.status(200).json({ message: "PDF deletado com sucesso." });
@@ -78,5 +73,5 @@ const deletePdf = async (req, res) => {
 module.exports = {
   getPdfs,
   createPdf,
-  deletePdf
+  deletePdf,
 };

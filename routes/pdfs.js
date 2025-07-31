@@ -13,7 +13,7 @@ const {
 // Configuração do multer para armazenar arquivos localmente
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "uploads/");  // pasta uploads precisa existir
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    // Aceita qualquer tipo de arquivo
+    // aceita todos os tipos
     cb(null, true);
   },
 });
@@ -33,8 +33,8 @@ const upload = multer({
 // Buscar PDFs
 router.get("/", authMiddleware, getPdfs);
 
-// Enviar PDFs (campo 'pdfs' deve bater com o frontend)
-router.post("/", authMiddleware, upload.array("files"), createPdf);
+// Enviar PDFs (nome do campo 'pdfs' deve bater com o frontend)
+router.post("/", authMiddleware, upload.array("pdfs"), createPdf);
 
 // Deletar PDF por ID
 router.delete("/:id", authMiddleware, deletePdf);
