@@ -25,11 +25,19 @@ if (!fs.existsSync(uploadDir)) {
 app.use(cors());
 app.use(express.json());
 
+// 🔐 Adiciona Content Security Policy
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; style-src 'self' 'unsafe-inline' https://www.gstatic.com; script-src 'self' https://www.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;"
+  );
+  next();
+});
+
 // Servir arquivos estáticos da pasta uploads
 app.use('/api/uploads', express.static(uploadDir));
 
 app.use("/api/auth", authRoutes);
-
 app.use("/api/tasks", authMiddleware, tasksRoutes);
 app.use("/api/appointments", authMiddleware, appointmentsRoutes);
 app.use("/api/pdfs", authMiddleware, pdfRoutes);
