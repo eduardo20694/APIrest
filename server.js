@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const { pool } = require("./db");
+const fs = require("fs");
+const path = require("path");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
@@ -13,11 +15,18 @@ const authMiddleware = require("./middleware/authMiddleware");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Criar pasta uploads se não existir
+const uploadDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log("Pasta uploads criada.");
+}
+
 app.use(cors());
 app.use(express.json());
 
 // Servir arquivos estáticos da pasta uploads
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(uploadDir));
 
 app.use("/api/auth", authRoutes);
 
