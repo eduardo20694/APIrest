@@ -35,6 +35,11 @@ app.use((req, res, next) => {
 });
 
 // Servir arquivos estáticos da pasta uploads
+const avatarRoutes = require("./routes/avatar");
+
+// Rota para upload de avatar (pode adicionar authMiddleware se quiser autenticação)
+app.use("/api/avatar", avatarRoutes);
+
 app.use('/api/uploads', express.static(uploadDir));
 
 app.use("/api/auth", authRoutes);
