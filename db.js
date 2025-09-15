@@ -15,6 +15,7 @@ async function criarTabelas() {
         nome TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         senha TEXT NOT NULL,
+        avatar_url TEXT, -- adiciona a coluna do avatar
         criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
@@ -57,6 +58,7 @@ async function criarTabelas() {
   }
 }
 
+// Executa a criação/atualização das tabelas
 criarTabelas();
 
 module.exports = { pool };
